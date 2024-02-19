@@ -1,0 +1,204 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+ 
+#define COUNT 30
+ 
+void start();  //函数声明
+void input();
+void save();
+void change();
+void sort();
+void dele();
+void output();
+void search();
+ 
+struct  information{   //定义结构体 
+ 
+    char devno[30];             //编号 
+    int devsort;                //所属部门 
+    char devmaster[30];         // 领用人 
+    char devname[30];           //设备名字 
+    int devprice;               //设备价格 
+    char devbuydate[30];        //购买日期 
+    int devstate;               // 设备状态 
+    char devdonenumber[30];     //设备数量 
+ 
+}dev[COUNT];                    //结构体变量 
+ 
+int count=0;
+FILE *fp;                      //文件指针 
+ 
+main()   //主函数
+{
+    while(1)
+    start(); 
+  
+}
+ 
+void start()  //启动菜单
+{
+ int chi;
+ printf("                            设备管理系统\n");
+ printf("              ********************************************\n");
+ printf("              *           1.设备信息的录入:              *\n");          
+ printf("              *           2.设备信息的修改:              *\n");
+ printf("              *           3.设备信息的分类统计:          *\n");
+ printf("              *           4.删除某个设备:                *\n");
+ printf("              *           5.查找某个设备:                *\n");
+ printf("              *           6.退出系统:                    *\n");
+ printf("              ********************************************\n");
+ printf("     》》*^_^*输入你的选择: ");
+ scanf("%d",&chi);
+ printf("\n");
+ if(chi==1) input();
+ else if(chi==2) change();
+ else if(chi==3) sort();
+ else if(chi==4) dele();
+ else if(chi==5) search();
+ else if(chi==6) { printf("谢谢使用，再见!*^_^*\n");  exit(0);}
+ else {  printf(" You Enter The Choice Is Not valid ! \n");  }
+ 
+ 
+}
+ 
+void input() //数据录入
+{
+    
+   char flag[20];
+   do{
+   printf("*^_^*请输入你的设备信息:\n");
+   printf("设备编号:");
+   scanf("%s",dev[count].devno);
+   printf("所属部门(1，A部门  2，B部门  3，C部门):");
+   scanf("%d",&dev[count].devsort);
+   printf("领用人；");
+   scanf("%s",dev[count].devmaster); 
+   printf("设备名字:");
+   scanf("%s",dev[count].devname);
+   printf("设备价格:");
+   scanf("%d",&dev[count].devprice);
+   printf("设备购买日期:");
+   scanf("%s",dev[count].devbuydate);
+   printf("设备状态(1未报废 0报废):");
+   scanf("%d",&dev[count].devstate);
+   printf("设备数量:");
+   scanf("%s",dev[count].devdonenumber);
+   count++;
+   printf("是否继续输入数据 y是  n否 : ");
+   scanf("%s",flag);
+   }while(strcmp(flag,"y")==0||strcmp(flag,"Y")==0);
+   output();
+   save();
+}
+void save()                           //数据保存      
+{
+    int i;
+    FILE *fp;
+    if((fp=fopen("shebei.txt","wb"))==NULL)
+    {
+        printf("cannot open file\n");
+        return;
+    }
+    for(i=0;i<2;i++)
+        if(fwrite(&dev[i],sizeof(struct information),1,fp)!=1)
+            printf("file write error\n");
+        fclose(fp);
+        printf("已保存设备信息到文件中*^_^*\n");
+}
+ 
+void change()  //数据修改
+{
+     char ch[20],a[20];
+     int i;
+      printf("\nyou sure want change devInfor y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)
+    { printf("\nenter you want change devName:");
+   scanf("%s",a);
+   for(i=0;i<count;i++)
+   {
+    if(strcmp(dev[i].devname,a)==0)
+    {  printf("\nyou sure want change dev name(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\nname:"); scanf("%s",dev[i].devname);}
+       printf("\nyou sure want change dev master(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\nmaster:"); scanf("%s",dev[i].devmaster);}
+       printf("\nyou sure want change dev no(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\nno"); scanf("%s",dev[i].devno);}
+       printf("\nyou sure want change dev sort(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\nsort"); scanf("%d",&dev[i].devsort);}
+       printf("\nyou sure want dev price(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\nprice"); scanf("%d",&dev[i].devprice);}
+       printf("\nyou sure want dev done date(y/n): ");
+       scanf("%s",ch);
+       if(strcmp(ch,"y")==0||strcmp(ch,"Y")==0)   { printf("\ndone date"); scanf("%s",dev[i].devdonenumber);}
+    
+ }
+    } 
+    save();
+     }
+output();
+ 
+}
+void sort()  //数据分类显示
+{ 
+    int i,chi,sum=0,wei=0,da=0,sao=0;
+  printf("输入你想要统计的信息: 1(报废的设备数目) 2(设备所属部门分类)");
+  scanf("%d",&chi);
+  if(chi==1) {
+      for(i=0;i<count;i++) {
+        if(dev[i].devstate==0) sum++;
+      }
+    printf("报废的设备数目为 %d \n",sum);
+  }
+  else if(chi==2){
+    for(i=0;i<count;i++) {
+        if(dev[i].devsort==1) wei++;
+        else  if(dev[i].devsort==2) da++;
+        else  if(dev[i].devsort==3) sao++;
+      } 
+    printf("A部门数量为 %d  B部门数量为 %d C部门数量和为 %d",wei,da,sao);
+  }else { printf("你输入的选项不符合要求!\n");}
+ 
+}
+void dele()  //数据删除
+{
+int i,j;
+char c[20];
+  printf("\nenter you want delete name ：\n");
+   printf("name：");
+   scanf("%s",c);
+   for(i=0;i<count;i++)
+   if(strcmp(c,dev[i].devname)==0)  break;
+    for(j=i;j<count-1;j++)
+    dev[j]=dev[j+1];
+    printf("\t\t\tyou had delete %s\n",c);
+    count--;
+  output();
+ 
+}
+void output()  //数据输出
+{
+   int i;
+    for(i=0;i<count;i++)
+    {
+     printf("%s %d %s %s %d %s %d %s\n",dev[i].devno,dev[i].devsort,dev[i].devmaster,dev[i].devname,dev[i].devprice,dev[i].devbuydate,dev[i].devstate,dev[i].devdonenumber);
+     
+    }
+ 
+}
+ 
+void search()  //数据查找
+{
+int i;
+char a[20],ch[10];
+   printf("\nenter you want look name:");
+   scanf("%s",a);
+   for(i=0;i<count;i++)  
+    if(strcmp(dev[i].devname,a)==0)  printf("%s %d %s %s %d %s %d %s\n",dev[i].devno,dev[i].devsort,dev[i].devmaster,dev[i].devname,dev[i].devprice,dev[i].devbuydate,dev[i].devstate,dev[i].devdonenumber);
+}
